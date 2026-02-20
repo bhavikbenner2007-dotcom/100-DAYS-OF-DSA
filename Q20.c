@@ -1,38 +1,46 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 
-int cmp(const void *a, const void *b) {
-    return (*(int*)a - *(int*)b);
+int cmp_ll(const void *a, const void *b) {
+    long long va = *(const long long*)a;
+    long long vb = *(const long long*)b;
+    if (va < vb) return -1;
+    if (va > vb) return 1;
+    return 0;
 }
 
 int main() {
     int n;
-    if (scanf("%d", &n) != 1 || n < 2) return 0;
+    if (scanf("%d", &n) != 1) return 0;
 
-    int *arr = malloc(n * sizeof(int));
-    for (int i = 0; i < n; ++i) scanf("%d", &arr[i]);
+    long long *pref = malloc((n + 1) * sizeof(long long));
+    if (!pref) return 0;
 
-    qsort(arr, n, sizeof(int), cmp);
-
-    int left = 0, right = n - 1;
-    int bestA = arr[0], bestB = arr[1];
-    int bestAbsSum = INT_MAX;
-
-    while (left < right) {
-        int sum = arr[left] + arr[right];
-        int absSum = abs(sum);
-        if (absSum < bestAbsSum) {
-            bestAbsSum = absSum;
-            bestA = arr[left];
-            bestB = arr[right];
-        }
-        if (sum > 0) right--;
-        else if (sum < 0) left++;
-        else break; // sum == 0 is optimal
+    pref[0] = 0;
+    long long sum = 0;
+    for (int i = 0; i < n; ++i) {
+        int x;
+        scanf("%d", &x);
+        sum += x;
+        pref[i + 1] = sum;
     }
 
-    printf("%d %d\n", bestA, bestB);
-    free(arr);
+    qsort(pref, n + 1, sizeof(long long), cmp_ll);
+
+    long long ans = 0;
+    long long count = 1;
+    for (int i = 1; i <= n; ++i) {
+        if (pref[i] == pref[i - 1]) {
+            ++count;
+        } else {
+            ans += (count * (count - 1)) / 2;
+            count = 1;
+        }
+    }
+    ans += (count * (count - 1)) / 2;
+
+    printf("%lld\n", ans);
+
+    free(pref);
     return 0;
 }
