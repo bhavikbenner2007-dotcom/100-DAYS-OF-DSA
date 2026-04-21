@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 1000  // maximum size of heap
+
+int heap[MAX];
+int size = 0;
+
+// Helper function to swap two elements
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Function to heapify upwards (for insert)
+void heapifyUp(int index) {
+    while (index > 0) {
+        int parent = (index - 1) / 2;
+        if (heap[parent] > heap[index]) {
+            swap(&heap[parent], &heap[index]);
+            index = parent;
+        } else {
+            break;
+        }
+    }
+}
+
+// Function to heapify downwards (for extractMin)
+void heapifyDown(int index) {
+    while (2 * index + 1 < size) {
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+        int smallest = index;
+
+        if (left < size && heap[left] < heap[smallest])
+            smallest = left;
+        if (right < size && heap[right] < heap[smallest])
+            smallest = right;
+
+        if (smallest != index) {
+            swap(&heap[index], &heap[smallest]);
+            index = smallest;
+        } else {
+            break;
+        }
+    }
+}
+
+// Insert operation
+void insert(int x) {
+    if (size == MAX) {
+        return; // heap full
+    }
+    heap[size] = x;
+    heapifyUp(size);
+    size++;
+}
+
+// Extract minimum element
+int extractMin() {
+    if (size == 0) {
+        return -1; // heap empty
+    }
+    int min = heap[0];
+    heap[0] = heap[size - 1];
+    size--;
+    heapifyDown(0);
+    return min;
+}
+
+// Peek operation
+int peek() {
+    if (size == 0) {
+        return -1; // heap empty
+    }
+    return heap[0];
+}
+
+int main() {
+    int N;
+    scanf("%d", &N);
+
+    char op[20];
+    int x;
+
+    for (int i = 0; i < N; i++) {
+        scanf("%s", op);
+
+        if (strcmp(op, "insert") == 0) {
+            scanf("%d", &x);
+            insert(x);
+        } else if (strcmp(op, "extractMin") == 0) {
+            printf("%d\n", extractMin());
+        } else if (strcmp(op, "peek") == 0) {
+            printf("%d\n", peek());
+        }
+    }
+
+    return 0;
+}
